@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UserService {
+  constructor(
+    private connection: DataSource
+  ) { }
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    // return 'This action adds a new user';
+
   }
 
   findAll() {
