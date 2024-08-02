@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,6 +18,15 @@ export class UserController {
     return this.userService.register(createUserDto);
   }
 
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    const user = await this.userService.verifyEmail(token)
+    if (!user) {
+      throw new BadRequestException('Invalid verification token');
+    }
+    return { message: 'Email verified successfully' };
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();
@@ -29,6 +38,8 @@ export class UserController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }

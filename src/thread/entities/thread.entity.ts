@@ -7,9 +7,9 @@ export class Thread extends AbstractEntity<Thread> {
     @Column()
     title: string
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, (user) => user.threadsCreated)
     creator: User
 
-    @ManyToMany(() => User)
+    @ManyToMany(() => User, (user) => user.threadsMember)
     members: User[]
 }

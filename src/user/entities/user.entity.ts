@@ -19,7 +19,10 @@ export class User extends AbstractEntity<User> {
     password: string
 
     @Column({ default: false })
-    isActivated: boolean
+    isVerified: boolean
+
+    @Column({ nullable: true })
+    verificationToken: string;
 
     @Column({ type: 'enum', enum: Role })
     role: string
@@ -28,7 +31,7 @@ export class User extends AbstractEntity<User> {
     @JoinTable()
     threadsCreated: Thread[]
 
-    @ManyToMany(() => Thread)
+    @ManyToMany(() => Thread, (thread) => thread.members)
     @JoinTable()
     threadsMember: Thread[]
 
