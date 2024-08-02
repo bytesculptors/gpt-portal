@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { Message } from "../message/entities/message.entity";
+import { Thread } from "../thread/entities/thread.entity";
+import { User } from "../user/entities/user.entity";
 
 @Module({
     imports: [
@@ -17,7 +20,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
                 password: 'pg',
                 port: 5432,
                 autoLoadEntities: true,
-                entities: ['./src/**/entities/*.entity.ts'],
+                entities: [User, Thread, Message],
             })
         })
     ]

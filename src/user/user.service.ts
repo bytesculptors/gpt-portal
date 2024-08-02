@@ -8,13 +8,15 @@ export class UserService {
   constructor(
     private connection: DataSource
   ) { }
-  create(createUserDto: CreateUserDto) {
-    // return 'This action adds a new user';
+  register(createUserDto: CreateUserDto) {
+    return 'This action adds a new user';
 
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    // return `This action returns all user`;
+    const users = await this.connection.getRepository('User').find()
+    return users
   }
 
   findOne(id: number) {

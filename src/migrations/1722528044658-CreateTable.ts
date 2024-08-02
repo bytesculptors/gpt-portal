@@ -17,8 +17,7 @@ export class CreateTable1722528044658 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "thread" ADD CONSTRAINT "FK_63c2b1000a2c622fe2c4d052537" FOREIGN KEY ("creatorId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "user_threads_member_thread" ADD CONSTRAINT "FK_3f6d7a520cfac10e605c363ab84" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE "user_threads_member_thread" ADD CONSTRAINT "FK_be9cf1ef8c1412e20560f830029" FOREIGN KEY ("threadId") REFERENCES "thread"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(``)
-        // Insert an admin to db
+        await queryRunner.query(`INSERT INTO "user"(email, username, password, role) VALUES ('john123@gmail.com', 'john123', '$2a$12$aKYsqpdZdgYzXDMZ1cwlx.zvlcj/pQLyGhYKzgNbsU1QrKY50DK7G', 'admin') `)
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
