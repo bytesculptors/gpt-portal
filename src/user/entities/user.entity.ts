@@ -35,6 +35,4 @@ export class User extends AbstractEntity<User> {
     @JoinTable()
     threadsMember: Thread[]
 
-    @OneToMany(() => Message, (message) => message.user)
-    messages: Message[]
 }

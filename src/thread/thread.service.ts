@@ -29,13 +29,17 @@ export class ThreadService {
 
   async update(id: number, updateThreadDto: UpdateThreadDto, userId: number) {
     // return `This action updates a #${id} thread`;
+    console.log(userId);
+
     const thread = await this.connection.getRepository('Thread').findOne({
       where: { id: id },
-      relations: ['creator']
+      relations: ['creator', 'members']
     })
     if (!thread) {
-      throw new NotFoundException('User not found!!')
+      throw new NotFoundException('Thread not found!!')
     }
+    console.log(thread);
+
     if (thread.creator.id !== userId) {
       throw new UnauthorizedException('You are not admin of this thread!!')
     }
@@ -44,8 +48,12 @@ export class ThreadService {
     if (!member) {
       throw new NotFoundException('This member has not been registered yet!!')
     }
-    thread.members = []
+    if (!thread.members) {
+      thread.members = [];
+    }
     thread.members.push(member)
+    console.log(thread);
+    await this.connection.getRepository('Thread').save(thread)
     return thread
   }
 

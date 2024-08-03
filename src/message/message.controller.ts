@@ -1,11 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { AuthGuard } from '../auth/auth.guard';
+import { RoleGuard } from '../role/role.guard';
+import { Roles } from '../role/role.decorator';
+import { Role } from '../role/role.enum';
 
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
+
+  @Post('send/:threadId/:receiverId')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  send(
+    @Request() req,
+    @Body() content: string,
+    @Param('threadId') threadId: number,
+    @Param('receiverId') receiverId: number
+  ) {
+    const sender = req.user
+    return this.messageService.send(content, threadId, sender, receiverId)
+  }
 
   @Post()
   create(@Body() createMessageDto: CreateMessageDto) {

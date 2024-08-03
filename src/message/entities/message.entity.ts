@@ -12,5 +12,8 @@ export class Message extends AbstractEntity<Message> {
     thread: Thread
 
     @ManyToOne(() => User)
-    user: User
+    sender: User
+
+    @ManyToOne(() => User)
+    receiver: User
 }
