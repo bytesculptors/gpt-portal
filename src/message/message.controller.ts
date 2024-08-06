@@ -28,9 +28,12 @@ export class MessageController {
     return this.messageService.create(createMessageDto);
   }
 
-  @Get('get')
-  findAll() {
-    return this.messageService.findAll();
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  @Get('getMessages/:threadId')
+  findAll(@Request() req, @Param('threadId') threadId: number) {
+    const userId = req.user.id
+    return this.messageService.findAll(userId, threadId);
   }
 
   @Get(':id')

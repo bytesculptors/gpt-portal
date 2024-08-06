@@ -42,36 +42,53 @@ export class MessageService {
     // if (thread.creator.id !== receiverId && !membersId.includes(receiverId)) {
     //   throw new UnauthorizedException(`The user with id ${receiverId} has not been added to this thread!`)
     // }
-    const message = this.connection.getRepository('Message').create({
-      content: content['content'],
-      thread: thread,
-      sender: sender
-    })
-    await this.connection.getRepository('Message').save(message)
+    // const message = this.connection.getRepository('Message').create({
+    //   content: content['content'],
+    //   thread: thread,
+    //   sender: sender
+    // })
+    // await this.connection.getRepository('Message').save(message)
 
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: [{ "role": "user", "content": content['content'] }],
-      // stream: true
+      messages: [
+        { "role": "system", "content": `${thread.context ? thread.context : ''}` },
+        { "role": "user", "content": content['content'] }
+      ],
+      stream: true
     })
-    const replyData = response.choices[0].message
-    const reply = this.connection.getRepository('Message').create({
-      content: replyData.content,
-      thread: thread,
-      sender: null,
-      replyTo: message
-    })
-    await this.connection.getRepository('Message').save(reply)
-    return { response: replyData.content }
+    for await (const part of response) {
+      console.log(part.choices[0].delta);
+    }
+    // const replyData = response.choices[0].message
+    // const reply = this.connection.getRepository('Message').create({
+    //   content: replyData.content,
+    //   thread: thread,
+    //   sender: null,
+    //   replyTo: message
+    // })
+    // await this.connection.getRepository('Message').save(reply)
+    // return { response: replyData.content }
   }
   create(createMessageDto: CreateMessageDto) {
     return 'This action adds a new message';
   }
 
-  async findAll() {
+  async findAll(userId: number, threadId: number) {
     // return `This action returns all message`;
+    const thread = await this.connection.getRepository('Thread').findOne({
+      where: { id: threadId },
+      relations: ['creator']
+    })
+    if (!thread) {
+      throw new NotFoundException('This thread does not exist!!')
+    }
+    if (thread.creator.id !== userId) {
+      throw new UnauthorizedException('You cannot see messages in this thread!!')
+    }
     const messages = await this.connection.getRepository('Message').find({
-      relations: ['replyTo']
+      relations: ['replyTo', 'thread'],
+      where: { thread: { id: threadId } }
     })
     return messages
   }

@@ -36,6 +36,14 @@ export class ThreadController {
     return this.threadService.update(userId, +id, updateThreadDto);
   }
 
+  @Post('addContext/:threadId')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  addContext(@Request() req, @Body() context: string, @Param('threadId') threadId: number) {
+    const userId = req.user.id
+    return this.threadService.addContext(context['context'], threadId, userId)
+  }
+
   // @Patch('addMember/:id')
   // @UseGuards(AuthGuard, RoleGuard)
   // @Roles(Role.USER)

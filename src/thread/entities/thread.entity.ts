@@ -8,6 +8,9 @@ export class Thread extends AbstractEntity<Thread> {
     @Column()
     title: string
 
+    @Column({ nullable: true })
+    context: string
+
     @ManyToOne(() => User, (user) => user.threadsCreated)
     creator: User
 

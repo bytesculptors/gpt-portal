@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
 import { DataSource } from 'typeorm';
@@ -11,9 +11,15 @@ export class ThreadService {
   ) { }
   async create(createThreadDto: CreateThreadDto, userId: number) {
     // return 'This action adds a new thread';
-    const creator = await this.connection.getRepository('User').findOneBy({ id: userId })
+    const creator = await this.connection.getRepository('User').findOne({
+      where: { id: userId },
+      relations: ['threadsCreated']
+    })
     if (!creator.isVerified) {
       throw new UnauthorizedException('You must verify your email to do this!')
+    }
+    if (creator.threadsCreated.length === 10) {
+      throw new ForbiddenException('You have reached the limit of creating 10 threads!!')
     }
     const thread = this.connection.getRepository('Thread').create({
       title: createThreadDto.title,
@@ -46,6 +52,22 @@ export class ThreadService {
       throw new UnauthorizedException('You do not have permission to update this thread!!')
     }
     thread.title = updateThreadDto.title
+    await this.connection.getRepository('Thread').save(thread)
+    return thread
+  }
+
+  async addContext(context: string, threadId: number, userId: number) {
+    const thread = await this.connection.getRepository('Thread').findOne({
+      where: { id: threadId },
+      relations: ['creator']
+    })
+    if (!thread) {
+      throw new NotFoundException('This thread has not been created!!')
+    }
+    if (thread.creator.id !== userId) {
+      throw new UnauthorizedException('You do not have permission to add context to this thread!!')
+    }
+    thread.context = context
     await this.connection.getRepository('Thread').save(thread)
     return thread
   }
