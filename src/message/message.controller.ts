@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ValidationPipe } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
@@ -11,17 +11,16 @@ import { Role } from '../role/role.enum';
 export class MessageController {
   constructor(private readonly messageService: MessageService) { }
 
-  @Post('send/:threadId/:receiverId')
+  @Post('send/:threadId')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   send(
     @Request() req,
-    @Body() content: string,
-    @Param('threadId') threadId: number,
-    @Param('receiverId') receiverId: number
+    @Body(new ValidationPipe()) content: string,
+    @Param('threadId') threadId: number
   ) {
-    const sender = req.user
-    return this.messageService.send(content, threadId, sender, receiverId)
+    const senderId = req.user.id
+    return this.messageService.send(content, threadId, senderId)
   }
 
   @Post()
@@ -29,7 +28,7 @@ export class MessageController {
     return this.messageService.create(createMessageDto);
   }
 
-  @Get()
+  @Get('get')
   findAll() {
     return this.messageService.findAll();
   }

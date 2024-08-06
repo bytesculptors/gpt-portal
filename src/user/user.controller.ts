@@ -28,8 +28,17 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Patch('deactivate/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  deactivate(@Param('id') id: number) {
+    return this.userService.deactivate(id)
   }
 
   @Get(':id')
@@ -38,8 +47,6 @@ export class UserController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.USER)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
   }

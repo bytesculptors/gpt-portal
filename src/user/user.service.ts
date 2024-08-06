@@ -44,6 +44,16 @@ export class UserService {
     return users
   }
 
+  async deactivate(id: number) {
+    const user = await this.connection.getRepository('User').findOneBy({ id: id })
+    if (!user) {
+      throw new NotFoundException('This user has not registered yet!!')
+    }
+    user.isVerified = false
+    await this.connection.getRepository('User').save(user)
+    return user
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }

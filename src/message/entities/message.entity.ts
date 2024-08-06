@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { AbstractEntity } from "../../abstract/abstract.entity";
 import { Thread } from "../../thread/entities/thread.entity";
 import { User } from "../../user/entities/user.entity";
@@ -14,6 +14,9 @@ export class Message extends AbstractEntity<Message> {
     @ManyToOne(() => User)
     sender: User
 
-    @ManyToOne(() => User)
-    receiver: User
+    // @ManyToOne(() => User)
+    // receiver: User
+    @OneToOne(() => Message, { nullable: true })
+    @JoinColumn()
+    replyTo?: Message
 }
