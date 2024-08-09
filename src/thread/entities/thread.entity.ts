@@ -11,12 +11,9 @@ export class Thread extends AbstractEntity<Thread> {
     @Column({ nullable: true })
     context: string
 
-    @ManyToOne(() => User, (user) => user.threadsCreated)
+    @ManyToOne(() => User, (user) => user.threadsCreated, { onDelete: 'CASCADE' })
     creator: User
 
-    @ManyToMany(() => User, (user) => user.threadsMember)
-    members: User[]
-
-    @OneToMany(() => Message, (message) => message.thread)
+    @OneToMany(() => Message, (message) => message.thread, { onDelete: 'CASCADE' })
     messages: Message[]
 }

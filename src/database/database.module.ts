@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Message } from "../message/entities/message.entity";
 import { Thread } from "../thread/entities/thread.entity";
 import { User } from "../user/entities/user.entity";
+import 'dotenv/config'
 
 @Module({
     imports: [
@@ -13,12 +14,12 @@ import { User } from "../user/entities/user.entity";
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: () => ({
-                type: 'postgres',
-                host: 'localhost',
-                database: process.env.NODE_ENV === 'test' ? 'test' : 'postgres',
-                username: 'pg',
-                password: 'pg',
-                port: 5432,
+                type: process.env.DB_TYPE as 'postgres' | 'mysql' | 'sqlite' | 'mariadb' | 'mongodb' | 'oracle' | 'mssql',
+                host: process.env.DB_HOST,
+                database: process.env.NODE_ENV === process.env.DB_TEST ? process.env.DB_TEST : process.env.DB_NAME,
+                username: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD,
+                port: parseInt(process.env.DB_PORT),
                 autoLoadEntities: true,
                 entities: [User, Thread, Message],
             })

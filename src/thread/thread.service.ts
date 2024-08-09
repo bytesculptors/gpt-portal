@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
 import { DataSource } from 'typeorm';
-import { AddMemberDto } from './dto/add-member.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ThreadService {
@@ -71,41 +71,29 @@ export class ThreadService {
     await this.connection.getRepository('Thread').save(thread)
     return thread
   }
-  remove(id: number) {
-    return `This action removes a #${id} thread`;
+  async remove(userId: number, id: number) {
+    // return `This action removes a #${id} thread`;
+    const thread = await this.connection.getRepository('Thread').findOne({
+      where: { id: id },
+      relations: ['creator']
+    })
+    if (!thread) {
+      throw new NotFoundException('This thread has not been created!!')
+    }
+    if (thread.creator.id !== userId) {
+      throw new UnauthorizedException('You do not have permission to delete this thread!!')
+    }
+    await this.connection
+      .getRepository('Message')
+      .createQueryBuilder()
+      .delete()
+      .from('Message')
+      .where("threadId = :id", { id: id })
+      .execute()
+
+    await this.connection.getRepository('Thread').delete({ id: id })
+    return { message: `Thread #${id} deleted successfully!!` }
   }
-
-  // async addMember(id: number, addMemberDto: AddMemberDto, userId: number) {
-  // return `This action updates a #${id} thread`;
-  // const user = await this.connection.getRepository('User').findOneBy({ id: userId })
-  // if (!user.isVerified) {
-  //   throw new UnauthorizedException('You must verify your email to do this!')
-  // }
-  // const thread = await this.connection.getRepository('Thread').findOne({
-  //   where: { id: id },
-  //   relations: ['creator', 'members']
-  // })
-  // if (!thread) {
-  //   throw new NotFoundException('Thread not found!!')
-  // }
-  // console.log(thread);
-
-  // if (thread.creator.id !== userId) {
-  //   throw new UnauthorizedException('You are not admin of this thread!!')
-  // }
-  // const memberId = addMemberDto.memberId
-  // const member = await this.connection.getRepository('User').findOneBy({ id: memberId })
-  // if (!member) {
-  //   throw new NotFoundException('This member has not been registered yet!!')
-  // }
-  // if (!thread.members) {
-  //   thread.members = [];
-  // }
-  // thread.members.push(member)
-  // console.log(thread);
-  // await this.connection.getRepository('Thread').save(thread)
-  // return thread
-  // }
 
   async findAll() {
     // return `This action returns all thread`;
@@ -115,6 +103,24 @@ export class ThreadService {
     return threads
   }
 
+  async filterByUser(username: string) {
+    const user = await this.connection.getRepository('User').findOne({
+      where: { username: username }
+    })
+    if (!user) {
+      throw new NotFoundException('This user does not exist!!')
+    }
+    const userId = user.id
+    console.log(userId);
+
+    const threads = this.connection
+      .getRepository('Thread')
+      .createQueryBuilder('thread')
+      .leftJoinAndSelect('thread.creator', 'creator')
+      .where('thread.creatorId = :userId', { userId: userId })
+      .getMany()
+    return threads
+  }
   async search(threadName: string) {
     const threads = await this.connection
       .getRepository('Thread')

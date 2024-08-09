@@ -31,8 +31,4 @@ export class User extends AbstractEntity<User> {
     @JoinTable()
     threadsCreated: Thread[]
 
-    @ManyToMany(() => Thread, (thread) => thread.members)
-    @JoinTable()
-    threadsMember: Thread[]
-
 }

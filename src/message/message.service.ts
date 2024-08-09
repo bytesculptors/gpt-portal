@@ -5,7 +5,6 @@ import { DataSource } from 'typeorm';
 import OpenAI from 'openai'
 import 'dotenv/config';
 
-// dotenv.config()
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
@@ -13,9 +12,7 @@ const openai = new OpenAI({
 @Injectable()
 export class MessageService {
   constructor(
-    private connection: DataSource,
-    // private messageGateway: MessageGateway,
-    // private server: Server
+    private connection: DataSource
   ) { }
   async send(content: string, threadId: number, senderId: number) {
     const thread = await this.connection.getRepository('Thread').findOne({
@@ -31,23 +28,9 @@ export class MessageService {
     if (!sender.isVerified) {
       throw new UnauthorizedException('You must verify your email to do send messages!')
     }
-    // const membersId = thread.members.map((member) => member.id)
     if (thread.creator.id !== sender.id) {
       throw new UnauthorizedException('You cannot send message to this thread')
     }
-    // const receiver = await this.connection.getRepository('User').findOneBy({ id: receiverId })
-    // if (!receiver) {
-    //   throw new NotFoundException('This receiver does not exist!!')
-    // }
-    // if (thread.creator.id !== receiverId && !membersId.includes(receiverId)) {
-    //   throw new UnauthorizedException(`The user with id ${receiverId} has not been added to this thread!`)
-    // }
-    // const message = this.connection.getRepository('Message').create({
-    //   content: content['content'],
-    //   thread: thread,
-    //   sender: sender
-    // })
-    // await this.connection.getRepository('Message').save(message)
 
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -60,15 +43,7 @@ export class MessageService {
     for await (const part of response) {
       console.log(part.choices[0].delta);
     }
-    // const replyData = response.choices[0].message
-    // const reply = this.connection.getRepository('Message').create({
-    //   content: replyData.content,
-    //   thread: thread,
-    //   sender: null,
-    //   replyTo: message
-    // })
-    // await this.connection.getRepository('Message').save(reply)
-    // return { response: replyData.content }
+
   }
   create(createMessageDto: CreateMessageDto) {
     return 'This action adds a new message';

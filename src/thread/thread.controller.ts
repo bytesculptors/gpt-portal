@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, Req } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { UpdateThreadDto } from './dto/update-thread.dto';
@@ -12,6 +12,7 @@ import { AddMemberDto } from './dto/add-member.dto';
 export class ThreadController {
   constructor(private readonly threadService: ThreadService) { }
 
+  // User: create thread
   @Post('create')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
@@ -20,6 +21,7 @@ export class ThreadController {
     return this.threadService.create(createThreadDto, userId);
   }
 
+  // User: find their own threads
   @Get('findOwnThreads')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
@@ -28,6 +30,7 @@ export class ThreadController {
     return this.threadService.findOwnThread(userId)
   }
 
+  // User: update their own thread
   @Patch('update/:id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
@@ -36,6 +39,7 @@ export class ThreadController {
     return this.threadService.update(userId, +id, updateThreadDto);
   }
 
+  // User: add context to their own thread
   @Post('addContext/:threadId')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
@@ -44,14 +48,16 @@ export class ThreadController {
     return this.threadService.addContext(context['context'], threadId, userId)
   }
 
-  // @Patch('addMember/:id')
-  // @UseGuards(AuthGuard, RoleGuard)
-  // @Roles(Role.USER)
-  // addMember(@Request() req, @Param('id') id: string, @Body() addMemberDto: AddMemberDto) {
-  //   const userId = req.user.id
-  //   return this.threadService.addMember(+id, addMemberDto, userId);
-  // }
+  // User: delete their own thread
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  @Delete(':id')
+  remove(@Request() req, @Param('id') id: string) {
+    const userId = req.user.id
+    return this.threadService.remove(userId, +id);
+  }
 
+  // Admin: List all threads of all users
   @Get('find')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
@@ -59,6 +65,15 @@ export class ThreadController {
     return this.threadService.findAll();
   }
 
+  // Admin: Filter threads by username
+  @Get('filter')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  async filter(@Query('username') username: string) {
+    return this.threadService.filterByUser(username)
+  }
+
+  // Admin: Search by threadname
   @Get('findOne')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
@@ -69,10 +84,5 @@ export class ThreadController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.threadService.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.threadService.remove(+id);
   }
 }

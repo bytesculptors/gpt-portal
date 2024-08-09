@@ -14,8 +14,6 @@ export class Message extends AbstractEntity<Message> {
     @ManyToOne(() => User)
     sender: User
 
-    // @ManyToOne(() => User)
-    // receiver: User
     @OneToOne(() => Message, { nullable: true })
     @JoinColumn()
     replyTo?: Message
