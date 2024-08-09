@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DataSource } from 'typeorm';
 import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcryptjs'
+import { generateToken } from '../token/generateTokenForEmail';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
   async register(createUserDto: CreateUserDto) {
     // return 'This action adds a new user';
     const { email, username, password, role } = createUserDto
-    const verificationToken = 'MACkP89TNIRvYP7vm05Z6p0XoPi0i/PoR5yx7wf68Ns='
+    const verificationToken = generateToken(16)
     const newUser = this.connection.getRepository('User').create({
       email,
       username,

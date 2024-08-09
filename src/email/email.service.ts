@@ -21,7 +21,7 @@ export class EmailService {
         console.log(email);
         const verificationLink = `http://localhost:3000/user/verify-email?token=${token}`
         const mailOptions = {
-            from: 'thht200603@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Email Verification',
             text: `Click on this link to verify your account ${verificationLink}`,
