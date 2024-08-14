@@ -41,7 +41,9 @@ export class UserService {
 
   async findAll() {
     // return `This action returns all user`;
-    const users = await this.connection.getRepository('User').find()
+    const users = await this.connection.getRepository('User').find({
+      relations: ['threadsCreated']
+    })
     return users
   }
 

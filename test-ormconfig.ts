@@ -9,7 +9,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_TEST,
   entities: ['./src/**/entities/*.entity.ts'],
-  migrations: ['dist/migrations/**/*.js']
+  migrations: ['dist/src/migrations/**/*.js']
 }
 
 export const setUp = async () => {

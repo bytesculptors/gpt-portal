@@ -25,7 +25,7 @@ export class MessageController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
-  @Get('getMessages/:threadId')
+  @Get('get/:threadId')
   findAll(@Request() req, @Param('threadId') threadId: number) {
     const userId = req.user.id
     return this.messageService.findAll(userId, threadId);
