@@ -1,5 +1,5 @@
 # Sử dụng image cơ sở cho Node.js
-FROM node:14
+FROM node:20
 
 # Tạo thư mục làm việc
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Cài đặt các phụ thuộc
-RUN npm install
+RUN yarn install
 
 # Sao chép mã nguồn vào container
 COPY . .
@@ -24,4 +24,4 @@ ENV POSTGRES_PORT=${POSTGRES_PORT:-5432}
 EXPOSE 3000
 
 # Chạy ứng dụng
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
