@@ -32,21 +32,30 @@ export class MessageService {
       throw new UnauthorizedException('You cannot send message to this thread')
     }
 
+    const message = this.connection.getRepository('Message').create({
+      content: content['content'],
+      thread: thread,
+      sender: sender
+    })
+    await this.connection.getRepository('Message').save(message)
+
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
         { "role": "system", "content": `${thread.context ? thread.context : ''}` },
         { "role": "user", "content": content['content'] }
       ],
-      stream: true
     })
-    for await (const part of response) {
-      console.log(part.choices[0].delta);
-    }
+    const replyData = response.choices[0].message
+    const reply = this.connection.getRepository('Message').create({
+      content: replyData.content,
+      thread: thread,
+      sender: null,
+      replyTo: message
+    })
+    await this.connection.getRepository('Message').save(reply)
+    return { response: replyData.content }
 
-  }
-  create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
   }
 
   async findAll(userId: number, threadId: number) {
@@ -66,17 +75,5 @@ export class MessageService {
       where: { thread: { id: threadId } }
     })
     return messages
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} message`;
   }
 }

@@ -57,32 +57,19 @@ export class ThreadController {
     return this.threadService.remove(userId, +id);
   }
 
-  // Admin: List all threads of all users
-  @Get('find')
+  // Admin: List all threads of all users or a specific user
+  @Get('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
-  findAll() {
-    return this.threadService.findAll();
+  find(@Query('username') username: string | null) {
+    return this.threadService.find(username);
   }
 
-  // Admin: Filter threads by username
-  @Get('filter')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.ADMIN)
-  async filter(@Query('username') username: string) {
-    return this.threadService.filterByUser(username)
-  }
-
-  // Admin: Search by threadname
-  @Get('findOne')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.ADMIN)
-  async search(@Query('name') threadName: string) {
-    return this.threadService.search(threadName)
-  }
-
+  // Admin: Search by thread id
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.threadService.findOne(+id);
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  async search(id: number) {
+    return this.threadService.search(id)
   }
 }

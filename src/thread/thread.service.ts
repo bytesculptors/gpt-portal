@@ -95,44 +95,38 @@ export class ThreadService {
     return { message: `Thread #${id} deleted successfully!!` }
   }
 
-  async findAll() {
+  async find(username: string) {
     // return `This action returns all thread`;
-    const threads = await this.connection.getRepository('Thread').find({
-      relations: ['creator']
-    })
-    return threads
-  }
+    let threads
+    if (!username) {
+      threads = await this.connection.getRepository('Thread').find({
+        relations: ['creator']
+      })
+    } else {
+      const user = await this.connection.getRepository('User').findOne({
+        where: { username: username }
+      })
+      if (!user) {
+        throw new NotFoundException('This user does not exist!!')
+      }
+      const userId = user.id
+      console.log(userId);
 
-  async filterByUser(username: string) {
-    const user = await this.connection.getRepository('User').findOne({
-      where: { username: username }
-    })
-    if (!user) {
-      throw new NotFoundException('This user does not exist!!')
+      threads = this.connection
+        .getRepository('Thread')
+        .createQueryBuilder('thread')
+        .leftJoinAndSelect('thread.creator', 'creator')
+        .where('thread.creatorId = :userId', { userId: userId })
+        .getMany()
     }
-    const userId = user.id
-    console.log(userId);
-
-    const threads = this.connection
-      .getRepository('Thread')
-      .createQueryBuilder('thread')
-      .leftJoinAndSelect('thread.creator', 'creator')
-      .where('thread.creatorId = :userId', { userId: userId })
-      .getMany()
-    return threads
-  }
-  async search(threadName: string) {
-    const threads = await this.connection
-      .getRepository('Thread')
-      .createQueryBuilder('thread')
-      .where('thread.title LIKE :threadName', { threadName: `%${threadName}%` })
-      .getMany();
-
     return threads
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} thread`;
+  async search(id: number) {
+    const threads = await this.connection.getRepository('Thread').find({
+      where: { id: id }
+    })
+    return threads
   }
 
 }

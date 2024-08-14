@@ -23,11 +23,6 @@ export class MessageController {
     return this.messageService.send(content, threadId, senderId)
   }
 
-  @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
-  }
-
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   @Get('getMessages/:threadId')
@@ -36,18 +31,4 @@ export class MessageController {
     return this.messageService.findAll(userId, threadId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messageService.update(+id, updateMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messageService.remove(+id);
-  }
 }
