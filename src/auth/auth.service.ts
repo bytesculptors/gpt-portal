@@ -11,7 +11,7 @@ export class AuthService {
     private connection: DataSource,
     private jwtService: JwtService
   ) { }
-  async login(username: string, password: string): Promise<{ access_token: string }> {
+  async login(username: string, password: string): Promise<{ access_token: string, role: string }> {
     const user = await this.connection.getRepository('User').findOneBy({ username: username })
 
     if (!user) {
@@ -25,7 +25,8 @@ export class AuthService {
     console.log(payload);
 
     return {
-      access_token: await this.jwtService.signAsync(payload)
+      access_token: await this.jwtService.signAsync(payload),
+      role: payload.role
     }
   }
   create(createAuthDto: CreateAuthDto) {
