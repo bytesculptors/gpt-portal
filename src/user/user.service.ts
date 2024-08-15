@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DataSource } from 'typeorm';
@@ -15,6 +15,15 @@ export class UserService {
   async register(createUserDto: CreateUserDto) {
     // return 'This action adds a new user';
     const { email, username, password, role } = createUserDto
+    let user
+    user = await this.connection.getRepository('User').findOneBy({ email: email })
+    if (user) {
+      throw new HttpException('This email has been registered', HttpStatus.CONFLICT)
+    }
+    user = await this.connection.getRepository('User').findOneBy({ username: username })
+    if (user) {
+      throw new HttpException('This username has been registered', HttpStatus.CONFLICT)
+    }
     const verificationToken = generateToken(16)
     const newUser = this.connection.getRepository('User').create({
       email,

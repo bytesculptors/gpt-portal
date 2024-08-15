@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,7 +14,7 @@ export class UserController {
   @Post('register')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
-  register(@Body() createUserDto: CreateUserDto) {
+  register(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     return this.userService.register(createUserDto);
   }
 
