@@ -12,6 +12,7 @@ import { Response } from 'express';
 export class MessageController {
   constructor(private readonly messageService: MessageService) { }
 
+  // User: send message to the thread
   @Post(':threadId/messages')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)

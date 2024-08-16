@@ -30,7 +30,7 @@ describe('Message Controller (e2e)', () => {
         password: '1234'
       })
     await request(app.getHttpServer())
-      .post('/user/register')
+      .post('/users')
       .set('Authorization', `Bearer ${adminLoginResponse.body.access_token}`)
       .send({
         email: 'tuannghia200603@gmail.com',
@@ -50,13 +50,13 @@ describe('Message Controller (e2e)', () => {
       })
     userToken = userLoginResponse.body.access_token
     await request(app.getHttpServer())
-      .post('/thread/create')
+      .post('/threads')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
         title: 'Discuss about natural disasters'
       })
     await request(app.getHttpServer())
-      .post('/message/send/1')
+      .post('/threads/1/messages')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
         content: 'What is natural disasters?'
@@ -65,7 +65,7 @@ describe('Message Controller (e2e)', () => {
 
   it('should send a message to the thread', async () => {
     await request(app.getHttpServer())
-      .post('/message/send/1')
+      .post('/threads/1/messages')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
         content: 'What is natural disasters?'
@@ -75,7 +75,7 @@ describe('Message Controller (e2e)', () => {
 
   it('should get all messages of a thread', async () => {
     await request(app.getHttpServer())
-      .get('/message/getMessages/1')
+      .get('/threads/1/messages')
       .set('Authorization', `Bearer ${userToken}`)
       .expect(200)
   })

@@ -22,29 +22,30 @@ export class ThreadController {
   }
 
   // User: update their own thread
-  @Patch(':id')
+  @Patch(':threadId')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
-  update(@Request() req, @Param('id') id: string, @Body() updateThreadDto: UpdateThreadDto) {
+  update(@Request() req, @Param('threadId') threadId: string, @Body() updateThreadDto: UpdateThreadDto) {
     const userId = req.user.id
-    return this.threadService.update(userId, +id, updateThreadDto);
+    return this.threadService.update(userId, +threadId, updateThreadDto);
   }
 
   // User: delete their own thread
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
-  @Delete(':id')
-  remove(@Request() req, @Param('id') id: string) {
+  @Delete(':threadId')
+  remove(@Request() req, @Param('threadId') threadId: string) {
     const userId = req.user.id
-    return this.threadService.remove(userId, +id);
+    return this.threadService.remove(userId, +threadId);
   }
 
+  // User: find all messages in a thread that you created
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
-  @Get(':id/messages')
-  findAll(@Request() req, @Param('id') id: number) {
+  @Get(':threadId/messages')
+  findAll(@Request() req, @Param('threadId') threadId: number, @Query('page') page: number) {
     const userId = req.user.id
-    return this.threadService.findAll(userId, id);
+    return this.threadService.findAll(userId, threadId, page);
   }
 
   // Admin: List all threads of all users or a specific user
@@ -56,11 +57,11 @@ export class ThreadController {
   }
 
   // Admin: Search by thread id
-  @Get(':id')
+  @Get(':threadId')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
-  async search(id: number) {
-    return this.threadService.search(id)
+  async search(@Param('threadId') threadId: number) {
+    return this.threadService.search(threadId)
   }
 
 }

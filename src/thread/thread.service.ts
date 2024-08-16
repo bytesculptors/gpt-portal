@@ -57,22 +57,6 @@ export class ThreadService {
     return thread
   }
 
-  // async addContext(context: string, threadId: number, userId: number) {
-  //   const thread = await this.connection.getRepository('Thread').findOne({
-  //     where: { id: threadId },
-  //     relations: ['creator']
-  //   })
-  //   if (!thread) {
-  //     throw new NotFoundException('This thread has not been created!!')
-  //   }
-  //   if (thread.creator.id !== userId) {
-  //     throw new UnauthorizedException('You do not have permission to add context to this thread!!')
-  //   }
-  //   thread.context = context
-  //   await this.connection.getRepository('Thread').save(thread)
-  //   return thread
-  // }
-
   async remove(userId: number, id: number) {
     // return `This action removes a #${id} thread`;
     const thread = await this.connection.getRepository('Thread').findOne({
@@ -131,7 +115,7 @@ export class ThreadService {
     return threads
   }
 
-  async findAll(userId: number, threadId: number) {
+  async findAll(userId: number, threadId: number, page: number): Promise<any> {
     // return `This action returns all message`;
     const thread = await this.connection.getRepository('Thread').findOne({
       where: { id: threadId },
@@ -143,11 +127,22 @@ export class ThreadService {
     if (thread.creator.id !== userId) {
       throw new UnauthorizedException('You cannot see messages in this thread!!')
     }
-    const messages = await this.connection.getRepository('Message').find({
+    const take = 2
+    const [messages, total] = await this.connection.getRepository('Message').findAndCount({
       relations: ['replyTo', 'thread'],
-      where: { thread: { id: threadId } }
+      where: { thread: { id: threadId } },
+      take,
+      skip: (page - 1) * take
     })
-    return messages
+    return {
+      data: messages,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take)
+      }
+    }
+    // return messages
   }
 
 }

@@ -32,7 +32,7 @@ describe('User Controller (e2e)', () => {
 
   it('should register a new user', () => {
     return request(app.getHttpServer())
-      .post('/user/register')
+      .post('/users')
       .set('Authorization', `Bearer ${token}`)
       .send({
         email: 'tuannghia200603@gmail.com',
@@ -45,7 +45,7 @@ describe('User Controller (e2e)', () => {
 
   it('should find all users', () => {
     return request(app.getHttpServer())
-      .get('/user')
+      .get('/users')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
   })

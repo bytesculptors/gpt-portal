@@ -1,4 +1,4 @@
-// jest.setTimeout(30000);
+jest.setTimeout(30000);
 import { INestApplication } from "@nestjs/common"
 import { TestingModule, Test } from "@nestjs/testing"
 import { AppModule } from "../src/app.module"
@@ -31,7 +31,7 @@ describe('Thread Controller (e2e)', () => {
       })
     adminToken = adminLoginResponse.body.access_token
     await request(app.getHttpServer())
-      .post('/user/register')
+      .post('/users')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
         email: 'tuannghia200603@gmail.com',
@@ -51,7 +51,7 @@ describe('Thread Controller (e2e)', () => {
       })
     userToken = userLoginResponse.body.access_token
     await request(app.getHttpServer())
-      .post('/thread/create')
+      .post('/threads')
       .set('Authorization', `Bearer ${userToken}`)
       .send({
         title: 'Discuss about natural disasters'
@@ -61,7 +61,7 @@ describe('Thread Controller (e2e)', () => {
   describe('User testing', () => {
     it('should create a new thread', () => {
       return request(app.getHttpServer())
-        .post('/thread/create')
+        .post('/threads')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           title: 'Homework thread'
@@ -71,7 +71,7 @@ describe('Thread Controller (e2e)', () => {
 
     it('should update a thread', () => {
       return request(app.getHttpServer())
-        .patch('/thread/update/1')
+        .patch('/threads/1')
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           title: 'Discuss about wild animals'
@@ -81,24 +81,14 @@ describe('Thread Controller (e2e)', () => {
 
     it('should find a thread', () => {
       return request(app.getHttpServer())
-        .get('/thread/findOwnThreads')
+        .get('/users/threads')
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200)
     })
 
-    it('should add context to a thread', () => {
-      return request(app.getHttpServer())
-        .post('/thread/addContext/1')
-        .set('Authorization', `Bearer ${userToken}`)
-        .send({
-          context: 'This is where we discuss about wild species living in the forest, ocean, mountain,...'
-        })
-        .expect(201)
-    })
-
     it('should delete a thread', () => {
       return request(app.getHttpServer())
-        .delete('/thread/1')
+        .delete('/threads/1')
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200)
     })
@@ -107,7 +97,7 @@ describe('Thread Controller (e2e)', () => {
   describe('Admin testing', () => {
     it('should return 404 as the username does not exist', () => {
       return request(app.getHttpServer())
-        .get('/thread')
+        .get('/threads')
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ username: 'ttn206' })
         .expect(404)
@@ -115,14 +105,14 @@ describe('Thread Controller (e2e)', () => {
 
     it('should find all threads', () => {
       return request(app.getHttpServer())
-        .get('/thread')
+        .get('/threads')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200)
     })
 
     it('should find threads of an user', () => {
       return request(app.getHttpServer())
-        .get('/thread')
+        .get('/threads')
         .set('Authorization', `Bearer ${adminToken}`)
         .query({ username: 'alex123' })
         .expect(200)
@@ -130,11 +120,9 @@ describe('Thread Controller (e2e)', () => {
 
     it('should find a thread with an id', () => {
       return request(app.getHttpServer())
-        .get('/thread/1')
+        .get('/threads/1')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200)
     })
   })
-
-
 })

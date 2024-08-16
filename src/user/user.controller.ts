@@ -6,11 +6,13 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
+  // Admin: create/register a new user
   @Post('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
@@ -27,13 +29,15 @@ export class UserController {
     return { message: 'Email verified successfully' };
   }
 
+  // Admin: find all users
   @Get('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query('page') page: number): Promise<User[]> {
+    return this.userService.findAll(page);
   }
 
+  // Admin: deactivate an user
   @Patch('deactivate/:id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)

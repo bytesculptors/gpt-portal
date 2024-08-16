@@ -51,14 +51,12 @@ export class MessageService {
     let replyContent = ''
     for await (const part of response) {
       const content = part.choices[0].delta?.content || ''
-      // console.log(part.choices[0].delta);
       if (content) {
         res.write(part.choices[0].delta?.content)
         replyContent += part.choices[0].delta?.content || ''
       }
 
     }
-    // const replyData = response.choices[0].message
     const reply = this.connection.getRepository('Message').create({
       content: replyContent,
       thread: thread,

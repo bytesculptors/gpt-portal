@@ -1,10 +1,10 @@
 import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { DataSource } from 'typeorm';
 import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcryptjs'
 import { generateToken } from '../token/generateTokenForEmail';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -48,12 +48,23 @@ export class UserService {
     return user
   }
 
-  async findAll() {
+  async findAll(page: number): Promise<any> {
     // return `This action returns all user`;
-    const users = await this.connection.getRepository('User').find({
-      relations: ['threadsCreated']
+    const take = 2
+    const [users, total] = await this.connection.getRepository('User').findAndCount({
+      relations: ['threadsCreated'],
+      take,
+      skip: (page - 1) * take
     })
-    return users
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take)
+      }
+    }
+
   }
 
   async deactivate(id: number) {
