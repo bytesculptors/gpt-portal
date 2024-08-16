@@ -39,14 +39,14 @@ export class ThreadController {
     return this.threadService.update(userId, +id, updateThreadDto);
   }
 
-  // User: add context to their own thread
-  @Post('addContext/:threadId')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.USER)
-  addContext(@Request() req, @Body() context: string, @Param('threadId') threadId: number) {
-    const userId = req.user.id
-    return this.threadService.addContext(context['context'], threadId, userId)
-  }
+  // // User: add context to their own thread
+  // @Post('addContext/:threadId')
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(Role.USER)
+  // addContext(@Request() req, @Body() context: string, @Param('threadId') threadId: number) {
+  //   const userId = req.user.id
+  //   return this.threadService.addContext(context['context'], threadId, userId)
+  // }
 
   // User: delete their own thread
   @UseGuards(AuthGuard, RoleGuard)
@@ -71,5 +71,13 @@ export class ThreadController {
   @Roles(Role.ADMIN)
   async search(id: number) {
     return this.threadService.search(id)
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  @Get(':threadId')
+  findAll(@Request() req, @Param('threadId') threadId: number) {
+    const userId = req.user.id
+    return this.threadService.findAll(userId, threadId);
   }
 }

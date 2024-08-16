@@ -5,4 +5,7 @@ import { IsString } from 'class-validator';
 export class UpdateThreadDto extends PartialType(CreateThreadDto) {
     @IsString()
     title: string
+
+    @IsString()
+    context?: string
 }
