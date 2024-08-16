@@ -8,11 +8,11 @@ import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
 import { Response } from 'express';
 
-@Controller()
+@Controller('threads')
 export class MessageController {
   constructor(private readonly messageService: MessageService) { }
 
-  @Post('threads/:threadId/messages')
+  @Post(':threadId/messages')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   send(

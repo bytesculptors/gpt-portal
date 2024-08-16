@@ -7,11 +7,11 @@ import { RoleGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  @Post('register')
+  @Post('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   register(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
@@ -27,7 +27,7 @@ export class UserController {
     return { message: 'Email verified successfully' };
   }
 
-  @Get()
+  @Get('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   findAll() {
@@ -48,20 +48,5 @@ export class UserController {
   findOwnThread(@Request() req) {
     const userId = req.user.id
     return this.userService.findOwnThread(userId)
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
   }
 }

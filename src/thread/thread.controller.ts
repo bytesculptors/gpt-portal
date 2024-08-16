@@ -13,22 +13,13 @@ export class ThreadController {
   constructor(private readonly threadService: ThreadService) { }
 
   // User: create thread
-  @Post('create')
+  @Post('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   create(@Request() req, @Body() createThreadDto: CreateThreadDto) {
     const userId = req.user.id
     return this.threadService.create(createThreadDto, userId);
   }
-
-  // // User: find their own threads
-  // @Get('user/threads')
-  // @UseGuards(AuthGuard, RoleGuard)
-  // @Roles(Role.USER)
-  // findOwnThread(@Request() req) {
-  //   const userId = req.user.id
-  //   return this.threadService.findOwnThread(userId)
-  // }
 
   // User: update their own thread
   @Patch(':id')
@@ -38,15 +29,6 @@ export class ThreadController {
     const userId = req.user.id
     return this.threadService.update(userId, +id, updateThreadDto);
   }
-
-  // // User: add context to their own thread
-  // @Post('addContext/:threadId')
-  // @UseGuards(AuthGuard, RoleGuard)
-  // @Roles(Role.USER)
-  // addContext(@Request() req, @Body() context: string, @Param('threadId') threadId: number) {
-  //   const userId = req.user.id
-  //   return this.threadService.addContext(context['context'], threadId, userId)
-  // }
 
   // User: delete their own thread
   @UseGuards(AuthGuard, RoleGuard)
@@ -59,10 +41,10 @@ export class ThreadController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
-  @Get(':threadId/messages')
-  findAll(@Request() req, @Param('threadId') threadId: number) {
+  @Get(':id/messages')
+  findAll(@Request() req, @Param('id') id: number) {
     const userId = req.user.id
-    return this.threadService.findAll(userId, threadId);
+    return this.threadService.findAll(userId, id);
   }
 
   // Admin: List all threads of all users or a specific user
