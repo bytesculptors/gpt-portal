@@ -8,7 +8,7 @@ import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
 import { AddMemberDto } from './dto/add-member.dto';
 
-@Controller('thread')
+@Controller('threads')
 export class ThreadController {
   constructor(private readonly threadService: ThreadService) { }
 
@@ -22,7 +22,7 @@ export class ThreadController {
   }
 
   // User: find their own threads
-  @Get('findOwnThreads')
+  @Get('myThreads')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   findOwnThread(@Request() req) {
@@ -31,7 +31,7 @@ export class ThreadController {
   }
 
   // User: update their own thread
-  @Patch('update/:id')
+  @Patch(':id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   update(@Request() req, @Param('id') id: string, @Body() updateThreadDto: UpdateThreadDto) {
@@ -57,6 +57,14 @@ export class ThreadController {
     return this.threadService.remove(userId, +id);
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  @Get(':threadId/messages')
+  findAll(@Request() req, @Param('threadId') threadId: number) {
+    const userId = req.user.id
+    return this.threadService.findAll(userId, threadId);
+  }
+
   // Admin: List all threads of all users or a specific user
   @Get('')
   @UseGuards(AuthGuard, RoleGuard)
@@ -73,11 +81,4 @@ export class ThreadController {
     return this.threadService.search(id)
   }
 
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.USER)
-  @Get(':threadId')
-  findAll(@Request() req, @Param('threadId') threadId: number) {
-    const userId = req.user.id
-    return this.threadService.findAll(userId, threadId);
-  }
 }
