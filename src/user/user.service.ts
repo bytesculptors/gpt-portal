@@ -66,6 +66,17 @@ export class UserService {
     return user
   }
 
+  async findOwnThread(userId: number) {
+    const threads = await this.connection
+      .getRepository('Thread')
+      .createQueryBuilder('thread')
+      .leftJoinAndSelect('thread.creator', 'creator')
+      .where('creator.id = :userId', { userId })
+      .getMany();
+
+    return threads
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }

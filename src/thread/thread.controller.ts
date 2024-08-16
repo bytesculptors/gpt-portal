@@ -21,14 +21,14 @@ export class ThreadController {
     return this.threadService.create(createThreadDto, userId);
   }
 
-  // User: find their own threads
-  @Get('myThreads')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.USER)
-  findOwnThread(@Request() req) {
-    const userId = req.user.id
-    return this.threadService.findOwnThread(userId)
-  }
+  // // User: find their own threads
+  // @Get('user/threads')
+  // @UseGuards(AuthGuard, RoleGuard)
+  // @Roles(Role.USER)
+  // findOwnThread(@Request() req) {
+  //   const userId = req.user.id
+  //   return this.threadService.findOwnThread(userId)
+  // }
 
   // User: update their own thread
   @Patch(':id')

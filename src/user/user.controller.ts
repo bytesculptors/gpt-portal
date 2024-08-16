@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, BadRequestException, ValidationPipe, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -39,6 +39,15 @@ export class UserController {
   @Roles(Role.ADMIN)
   deactivate(@Param('id') id: number) {
     return this.userService.deactivate(id)
+  }
+
+  // User: find their own threads
+  @Get('threads')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.USER)
+  findOwnThread(@Request() req) {
+    const userId = req.user.id
+    return this.userService.findOwnThread(userId)
   }
 
   @Get(':id')

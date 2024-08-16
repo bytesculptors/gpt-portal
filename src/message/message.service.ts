@@ -70,23 +70,4 @@ export class MessageService {
     res.end()
 
   }
-
-  // async findAll(userId: number, threadId: number) {
-  //   // return `This action returns all message`;
-  //   const thread = await this.connection.getRepository('Thread').findOne({
-  //     where: { id: threadId },
-  //     relations: ['creator']
-  //   })
-  //   if (!thread) {
-  //     throw new NotFoundException('This thread does not exist!!')
-  //   }
-  //   if (thread.creator.id !== userId) {
-  //     throw new UnauthorizedException('You cannot see messages in this thread!!')
-  //   }
-  //   const messages = await this.connection.getRepository('Message').find({
-  //     relations: ['replyTo', 'thread'],
-  //     where: { thread: { id: threadId } }
-  //   })
-  //   return messages
-  // }
 }

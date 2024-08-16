@@ -24,13 +24,4 @@ export class MessageController {
     const senderId = req.user.id
     return this.messageService.send(res, content, threadId, senderId)
   }
-
-  // @UseGuards(AuthGuard, RoleGuard)
-  // @Roles(Role.USER)
-  // @Get(':threadId')
-  // findAll(@Request() req, @Param('threadId') threadId: number) {
-  //   const userId = req.user.id
-  //   return this.messageService.findAll(userId, threadId);
-  // }
-
 }
