@@ -43,9 +43,9 @@ export class ThreadController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   @Get(':threadId/messages')
-  findAll(@Request() req, @Param('threadId') threadId: number, @Query('page') page: number) {
+  findAll(@Request() req, @Param('threadId') threadId: number, @Query('page') page: number, @Query('limit') limit: number) {
     const userId = req.user.id
-    return this.threadService.findAll(userId, threadId, page);
+    return this.threadService.findAll(userId, threadId, page, limit);
   }
 
   // Admin: List all threads of all users or a specific user

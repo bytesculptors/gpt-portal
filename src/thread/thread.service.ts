@@ -115,7 +115,7 @@ export class ThreadService {
     return threads
   }
 
-  async findAll(userId: number, threadId: number, page: number): Promise<any> {
+  async findAll(userId: number, threadId: number, page: number, limit: number): Promise<any> {
     // return `This action returns all message`;
     const thread = await this.connection.getRepository('Thread').findOne({
       where: { id: threadId },
@@ -127,7 +127,7 @@ export class ThreadService {
     if (thread.creator.id !== userId) {
       throw new UnauthorizedException('You cannot see messages in this thread!!')
     }
-    const take = 2
+    const take = limit
     const [messages, total] = await this.connection.getRepository('Message').findAndCount({
       relations: ['replyTo', 'thread'],
       where: { thread: { id: threadId } },
@@ -137,9 +137,8 @@ export class ThreadService {
     return {
       data: messages,
       meta: {
-        total,
         page,
-        last_page: Math.ceil(total / take)
+        total_page: Math.ceil(total / take)
       }
     }
     // return messages
