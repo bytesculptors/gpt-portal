@@ -128,16 +128,17 @@ export class ThreadService {
       throw new UnauthorizedException('You cannot see messages in this thread!!')
     }
     const take = limit ? limit : 10
-    page = (page ? page : 1)
+    page = page ? page : 1
     const [messages, total] = await this.connection.getRepository('Message').findAndCount({
       relations: ['replyTo', 'thread'],
       where: { thread: { id: threadId } },
       take,
       skip: (page - 1) * take,
-      order: { id: 'ASC' }
+      order: { id: 'DESC' }
     })
+    const orderedMessages = messages.reverse();
     return {
-      data: messages,
+      data: orderedMessages,
       meta: {
         page,
         total_page: Math.ceil(total / take)
