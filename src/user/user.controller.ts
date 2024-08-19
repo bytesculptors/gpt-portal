@@ -33,8 +33,8 @@ export class UserController {
   @Get('')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
-  findAll(@Query('page') page: number): Promise<User[]> {
-    return this.userService.findAll(page);
+  findAll(@Query('page') page: number, @Query('limit') limit: number): Promise<User[]> {
+    return this.userService.findAll(page, limit);
   }
 
   // Admin: deactivate an user

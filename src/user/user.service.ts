@@ -48,20 +48,20 @@ export class UserService {
     return user
   }
 
-  async findAll(page: number): Promise<any> {
+  async findAll(page: number, limit: number): Promise<any> {
     // return `This action returns all user`;
-    const take = 2
+    const take = limit ? limit : 1
     const [users, total] = await this.connection.getRepository('User').findAndCount({
       relations: ['threadsCreated'],
       take,
       skip: (page - 1) * take
     })
+    page = page ? page : 1
     return {
       data: users,
       meta: {
-        total,
         page,
-        last_page: Math.ceil(total / take)
+        total_page: Math.ceil(total / take)
       }
     }
 
