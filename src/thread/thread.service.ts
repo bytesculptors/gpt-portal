@@ -127,12 +127,14 @@ export class ThreadService {
     if (thread.creator.id !== userId) {
       throw new UnauthorizedException('You cannot see messages in this thread!!')
     }
-    const take = limit
+    const take = limit ? limit : 10
+    page = (page ? page : 1)
     const [messages, total] = await this.connection.getRepository('Message').findAndCount({
       relations: ['replyTo', 'thread'],
       where: { thread: { id: threadId } },
       take,
-      skip: (page - 1) * take
+      skip: (page - 1) * take,
+      order: { id: 'ASC' }
     })
     return {
       data: messages,
