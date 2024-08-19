@@ -19,12 +19,12 @@ export class EmailService {
 
     async sendVerificationEmail(email: string, token: string) {
         console.log(email);
-        const verificationLink = `http://localhost:3000/user/verify-email?token=${token}`
+        const verificationLink = `http://localhost:3000/users/verify-email?token=${token}`
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Email Verification',
-            text: `Click on this link to verify your account ${verificationLink}`,
+            subject: 'Welcome to GPT Portal',
+            text: `Verify your account here ${verificationLink}`,
             html: `<p>Please verify your email by clicking on the following link: <a href="${verificationLink}">Verify Email</a></p>`
         }
 
