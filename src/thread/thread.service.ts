@@ -89,20 +89,19 @@ export class ThreadService {
         relations: ['creator']
       })
     } else {
-      const user = await this.connection.getRepository('User').findOne({
-        where: { username: username }
-      })
-      if (!user) {
-        throw new NotFoundException('This user does not exist!!')
-      }
-      const userId = user.id
-      console.log(userId);
+      // const user = await this.connection.getRepository('User').findOne({
+      //   where: { username: username }
+      // })
+      // if (!user) {
+      //   throw new NotFoundException('This user does not exist!!')
+      // }
+      // const userId = user.id
 
       threads = this.connection
         .getRepository('Thread')
         .createQueryBuilder('thread')
         .leftJoinAndSelect('thread.creator', 'creator')
-        .where('thread.creatorId = :userId', { userId: userId })
+        .where('creator.username LIKE :username', { username: `%${username}%` })
         .getMany()
     }
     return threads
