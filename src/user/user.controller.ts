@@ -7,13 +7,17 @@ import { RoleGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
 import { User } from './entities/user.entity';
+import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
   // Admin: create/register a new user
   @Post('')
+  @ApiCreatedResponse({ description: 'User registered successfully!!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   register(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
@@ -31,6 +35,9 @@ export class UserController {
 
   // Admin: find all users
   @Get('')
+  @ApiOkResponse({ description: 'All users found!!' })
+  @ApiNotFoundResponse({ description: 'Cannot find any users' })
+
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   findAll(@Query('page') page: number, @Query('limit') limit: number): Promise<User[]> {
@@ -39,6 +46,8 @@ export class UserController {
 
   // Admin: deactivate an user
   @Patch('deactivate/:id')
+  @ApiOkResponse({ description: 'User deactivated!!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   deactivate(@Param('id') id: number) {
@@ -47,6 +56,8 @@ export class UserController {
 
   // User: find their own threads
   @Get('threads')
+  @ApiOkResponse({ description: 'Threads found!!' })
+  @ApiNotFoundResponse({ description: 'Cannot find any threads' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   findOwnThread(@Request() req) {

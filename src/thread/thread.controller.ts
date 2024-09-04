@@ -6,7 +6,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../role/role.guard';
 import { Roles } from '../role/role.decorator';
 import { Role } from '../role/role.enum';
-import { AddMemberDto } from './dto/add-member.dto';
+import { ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('threads')
 export class ThreadController {
@@ -14,6 +14,8 @@ export class ThreadController {
 
   // User: create thread
   @Post('')
+  @ApiCreatedResponse({ description: 'Thread created!!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   create(@Request() req, @Body() createThreadDto: CreateThreadDto) {
@@ -23,6 +25,8 @@ export class ThreadController {
 
   // User: update their own thread
   @Patch(':threadId')
+  @ApiOkResponse({ description: 'Thread updated successfully!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   update(@Request() req, @Param('threadId') threadId: string, @Body() updateThreadDto: UpdateThreadDto) {
@@ -34,6 +38,8 @@ export class ThreadController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   @Delete(':threadId')
+  @ApiOkResponse({ description: 'Thread deleted successfully!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   remove(@Request() req, @Param('threadId') threadId: string) {
     const userId = req.user.id
     return this.threadService.remove(userId, +threadId);
@@ -43,6 +49,8 @@ export class ThreadController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.USER)
   @Get(':threadId/messages')
+  @ApiOkResponse({ description: 'Add messages found!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   findAll(@Request() req, @Param('threadId') threadId: number, @Query('page') page: number, @Query('limit') limit: number) {
     const userId = req.user.id
     return this.threadService.findAll(userId, threadId, page, limit);
@@ -50,6 +58,8 @@ export class ThreadController {
 
   // Admin: List all threads of all users or a specific user
   @Get('')
+  @ApiOkResponse({ description: 'All threads found!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   find(@Query('username') username: string | null) {
@@ -58,6 +68,8 @@ export class ThreadController {
 
   // Admin: Search by thread id
   @Get(':threadId')
+  @ApiOkResponse({ description: 'Thread found!' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to do that!!' })
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   async search(@Param('threadId') threadId: number) {
